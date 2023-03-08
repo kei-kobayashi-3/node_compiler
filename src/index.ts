@@ -1,5 +1,5 @@
 import * as readline from 'readline';
-import { readFile } from './readFile';
+import { readFile, writeFiles } from './ioFile';
 import { tokenize, trimLines } from './jackTokenizer';
 
 // コンソールからパスを入力する
@@ -16,10 +16,11 @@ inputPath.question(
     inputPath.close()
 
     // contentごとにトリムした値を配列に格納
-    let tokensList: any = [];
+    let tokensList: string[][] = [];
     fileConfigs.contents.forEach(
       content => tokensList.push(tokenize(trimLines(content)))
     )
-    console.log(tokensList);
-
-  });
+    // tokenList, fileConfig .contents, folderPath を引数にXMLファイルを作成する
+    writeFiles(tokensList, fileConfigs.fileNames, folderPath);
+  }
+);
