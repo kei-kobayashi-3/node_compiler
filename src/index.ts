@@ -1,4 +1,5 @@
 import * as readline from 'readline';
+import { compileClass, exportXml, getXmlConfigs, xmlConfigs, xmlStack } from './compilationEngine';
 import { readFile, writeFiles } from './ioFile';
 import { tokenize, trimLines } from './jackTokenizer';
 
@@ -20,7 +21,14 @@ inputPath.question(
     fileConfigs.contents.forEach(
       content => tokensList.push(tokenize(trimLines(content)))
     )
-    // tokenList, fileConfig .contents, folderPath を引数にXMLファイルを作成する
-    writeFiles(tokensList, fileConfigs.fileNames, folderPath);
+    let results: string[] = [];
+    tokensList.forEach(
+      tokens => {
+        getXmlConfigs(tokens);
+        compileClass();
+        results.push(exportXml);
+      }
+    );
+    writeFiles(results, fileConfigs.fileNames, folderPath);
   }
 );

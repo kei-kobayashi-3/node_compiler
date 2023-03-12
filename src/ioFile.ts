@@ -24,25 +24,19 @@ export function readFile(folderPath: string) {
 }
 
 // ファイルにトークンを書き込む
-export function writeFiles(tokenList: string[][], fileNames: string[], folderPath: string){
-  tokenList.forEach(
+export function writeFiles(xmlList: string[], fileNames: string[], folderPath: string){
+  xmlList.forEach(
     (item, index) => {
       writeFile(item, fileNames[index], folderPath);
     }
   )
 }
 
-function writeFile(tokens: string[], fileName: string, folderPath: string){
+function writeFile(xml: string, fileName: string, folderPath: string){
   const filePath = folderPath + "/" + fileName.replace(".jack", ".xml");
   try {
-    fs.writeFileSync(filePath, "<tokens>\n");
-    tokens.forEach(
-      token => fs.appendFileSync(filePath, getXml(token), {flag: "a"})
-    );
-    fs.appendFileSync(filePath, "</tokens>", {flag: "a"});
-
+    fs.writeFileSync(filePath, xml);
   } catch (error) {
     console.error(`Problem writing file. :${fileName}`);
   }
-
 }

@@ -1,4 +1,9 @@
-// tokenに対し、出力する行の文字列を返す
+
+// tokenに対し、出力するxmlの情報を返す
+export interface xmlConfig {
+  [key: string] : string;
+  xml : string;
+}
 export function getXml(token: string){
   const regExpKeyword = /^(class|constructor|function|method|field|static|var|int|char|boolean|void|true|false|null|this|let|do|if|else|while|return)$/;
   const regExpSymbol = /^([\{\}\(\)\[\].,;+\-*\/&\|<>=~])$/;
@@ -12,8 +17,12 @@ export function getXml(token: string){
   const stringIs = regExpString.exec(token);
   const identifierIs = regExpIdentifier.exec(token);
 
+  const xmlConfig: xmlConfig = {xml: ""};
+
   if (keywordIs){
-    return `\t<keyword> ${keywordIs[1]} </keyword>\n`;
+    xmlConfig["keyword"] = keywordIs[1];
+    xmlConfig["xml"] = `<keyword> ${keywordIs[1]} </keyword>`;
+    return xmlConfig;
   }else if (symbolIs){
     let sy = symbolIs[1];
     if (sy === "<"){
@@ -25,15 +34,23 @@ export function getXml(token: string){
     }else{
       sy = sy
     }
-    return `\t<symbol> ${sy} </symbol>\n`;
+    xmlConfig["symbol"] = symbolIs[1];
+    xmlConfig["xml"] = `<symbol> ${sy} </symbol>`;
+    return xmlConfig;
   }else if (integerIs){
-    return `\t<integerConstant> ${integerIs[1]} </integerConstant>\n`;
+    xmlConfig["integerConstant"] = integerIs[1];
+    xmlConfig["xml"] = `<integerConstant> ${integerIs[1]} </integerConstant>`;
+    return xmlConfig;
   }else if (stringIs){
-    return `\t<stringConstant> ${stringIs[1]} </stringConstant>\n`;
+    xmlConfig["stringConstant"] = stringIs[1];
+    xmlConfig["xml"] = `<stringConstant> ${stringIs[1]} </stringConstant>`;
+    return xmlConfig;
   }else if (identifierIs){
-    return `\t<identifier> ${identifierIs[1]} </identifier>\n`;
+    xmlConfig["identifier"] = identifierIs[1];
+    xmlConfig["xml"] = `<identifier> ${identifierIs[1]} </identifier>`;
+    return xmlConfig;
   }else{
-     return `Problem parsing to XML. : ${token}`;
+     console.error(`Problem parsing to XML. : ${token}`);
   }
 }
 
@@ -52,7 +69,8 @@ export function tokenize(content: string[]){
 
 // string(ファイルごとの読み取ったファイルの内容をクリーンして行ごとに分割し、string[]を返却)
 export function trimLines(content: string){
-  let lineContents = content.split(/(?!".*)\n(?!")/)
+  let lineContents = content.replace(/\/\*[\s\S]*?\*\//g, "\n")
+                      .split(/(?!".*)\n(?!")/)
                       .map(s => s.trim().replace(/^\/.*|\/\/.*/, ""))
                       .filter(s => s !== "");
   return lineContents;
